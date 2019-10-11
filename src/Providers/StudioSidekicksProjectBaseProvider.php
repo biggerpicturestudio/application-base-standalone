@@ -1,6 +1,6 @@
 <?php
 
-namespace  BPStudio\Providers;
+namespace  StudioSidekicks\Providers;
 
 use Illuminate\Support\ServiceProvider;
 

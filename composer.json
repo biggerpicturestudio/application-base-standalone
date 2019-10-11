@@ -32,7 +32,7 @@
         "component": "package",
         "laravel": {
             "providers": [
-                "StudioSidekicks\\Auth\\Providers\\StudioSidekicksProjectBaseProvider"
+                "StudioSidekicks\\Providers\\StudioSidekicksProjectBaseProvider"
             ],
             "aliases": {
             }
