@@ -1,0 +1,42 @@
+{
+    "name": "studiosidekicks/application-base",
+    "type": "library",
+    "description": "Contains required auth modules for every project started in BP",
+    "keywords": [],
+    "homepage": "https://www.biggerpicture.agency",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Monika Bernaś",
+            "email": "monika.bernas@outlook.com",
+            "role": "Back-End Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.2",
+        "tymon/jwt-auth": "^1.0.0-rc.5",
+        "cartalyst/sentinel": "^3.0",
+    },
+    "autoload": {
+        "psr-4": {
+            "BPStudio\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "extra": {
+        "component": "package",
+        "laravel": {
+            "providers": [
+                "BPStudio\\BPStudioProjectBaseProvider"
+            ],
+            "aliases": {
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
