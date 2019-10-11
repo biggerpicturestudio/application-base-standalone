@@ -31,8 +31,7 @@ class StudioSidekicksProjectBaseProvider extends ServiceProvider
     protected function prepareResources()
     {
         // Publish config
-        $config = realpath(__DIR__.'/../config/config.php');
-
+        $config = realpath(__DIR__.'/../../config/config.php');
         $this->mergeConfigFrom($config, 'bpstudio.base');
 
         $this->publishes([
