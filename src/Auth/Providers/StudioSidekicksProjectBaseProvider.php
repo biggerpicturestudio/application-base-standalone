@@ -4,7 +4,7 @@ namespace  BPStudio\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-class BPStudioProjectBaseProvider extends ServiceProvider
+class StudioSidekicksProjectBaseProvider extends ServiceProvider
 {
     /**
      * {@inheritdoc}

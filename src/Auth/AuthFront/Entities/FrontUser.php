@@ -1,6 +1,6 @@
 <?php
 
-namespace BPStudio\AuthFront\Entities;
+namespace StudioSidekicks\Auth\AuthFront\Entities;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
