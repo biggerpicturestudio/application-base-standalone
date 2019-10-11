@@ -38,6 +38,7 @@
                 "StudioSidekicks\\Providers\\StudioSidekicksProjectBaseProvider"
             ],
             "aliases": {
+                "BackAuth": "StudioSidekicks\\Auth\\Back\\Facades\\BackAuth"
             }
         }
     },
