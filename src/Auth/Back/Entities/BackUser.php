@@ -1,6 +1,6 @@
 <?php
 
-namespace StudioSidekicks\Auth\BackAuth\Entities;
+namespace StudioSidekicks\Auth\Back\Entities;
 
 use Cartalyst\Sentinel\Users\EloquentUser;
 use Illuminate\Auth\Authenticatable;

@@ -20,7 +20,7 @@
     },
     "autoload": {
         "psr-4": {
-            "StudioSidekicks\\Auth\\": "src/"
+            "StudioSidekicks\\": "src/"
         }
     },
     "config": {
