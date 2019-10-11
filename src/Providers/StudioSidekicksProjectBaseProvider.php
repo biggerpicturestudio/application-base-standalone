@@ -3,6 +3,10 @@
 namespace  StudioSidekicks\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use StudioSidekicks\Auth\Back\Facades\BackAuth;
+use StudioSidekicks\Auth\Back\Repositories\RoleRepository;
+use StudioSidekicks\Auth\Back\Repositories\UserRepository;
+use StudioSidekicks\Auth\Back\Services\BackAuthService;
 
 class StudioSidekicksProjectBaseProvider extends ServiceProvider
 {
@@ -11,7 +15,7 @@ class StudioSidekicksProjectBaseProvider extends ServiceProvider
      */
     public function boot()
     {
-//        $this->setOverrides();
+        $this->setOverrides();
     }
 
     /**
@@ -20,7 +24,7 @@ class StudioSidekicksProjectBaseProvider extends ServiceProvider
     public function register()
     {
         $this->prepareResources();
-//        $this->setUserResolver();
+        $this->registerBackAuth();
     }
 
     /**
@@ -32,39 +36,71 @@ class StudioSidekicksProjectBaseProvider extends ServiceProvider
     {
         // Publish config
         $config = realpath(__DIR__.'/../../config/config.php');
-        $this->mergeConfigFrom($config, 'bpstudio.base');
+        $this->mergeConfigFrom($config, 'studiosidekicks.base');
 
         $this->publishes([
-            $config => config_path('bpstudio.base.php'),
+            $config => config_path('studiosidekicks.base.php'),
         ], 'config');
 
         // Publish migrations
-        $migrations = realpath(__DIR__.'/../migrations');
+        $migrations = realpath(__DIR__.'/../../migrations');
 
         $this->publishes([
             $migrations => $this->app->databasePath().'/migrations',
         ], 'migrations');
     }
-//
-//    /**
-//     * Registers the users.
-//     *
-//     * @return void
-//     */
-//    protected function registerUsers()
-//    {
-//        $this->registerHasher();
-//
-//        $this->app->singleton('sentinel.users', function ($app) {
-//            $config = $app['config']->get('cartalyst.sentinel.users');
-//
-//            return new IlluminateUserRepository(
-//                $app['sentinel.hasher'],
-//                $app['events'],
-//                $config['model']
-//            );
-//        });
-//    }
+
+    /**
+     * Registers the users.
+     *
+     * @return void
+     */
+    private function registerBackUsers()
+    {
+        $this->app->singleton('studiosidekicks.back_auth.users', function ($app) {
+            $config = $app['config']->get('studiosidekicks.base.auth.back');
+
+            return new UserRepository(
+                $app['sentinel.hasher'],
+                $app['events'],
+                $config['model']
+            );
+        });
+    }
+
+    /**
+     * Registers the roles.
+     *
+     * @return void
+     */
+    private function registerBackRoles()
+    {
+        $this->app->singleton('studiosidekicks.back_auth.roles', function ($app) {
+            $config = $app['config']->get('studiosidekicks.base.auth.back');
+
+            return new RoleRepository($config['role_model']);
+        });
+    }
+
+    /**
+     * Registers sentinel.
+     *
+     * @return void
+     */
+    protected function registerBackAuth()
+    {
+        $this->registerBackUsers();
+        $this->registerBackRoles();
+
+        $this->app->singleton('studiosidekicks.back_auth', function ($app) {
+            return new BackAuthService(
+                $app['studiosidekicks.back_auth.users'],
+                $app['studiosidekicks.back_auth.roles']
+            );
+        });
+
+        $this->app->alias('BackAuth', BackAuth::class);
+    }
 
     /**
      * {@inheritdoc}
@@ -72,21 +108,10 @@ class StudioSidekicksProjectBaseProvider extends ServiceProvider
     public function provides()
     {
         return [
+            'studiosidekicks.back_auth',
+            'studiosidekicks.back_auth.users',
+            'studiosidekicks.back_auth.roles',
         ];
-    }
-
-    /**
-     * Sets the user resolver on the request class.
-     *
-     * @return void
-     */
-    protected function setUserResolver()
-    {
-        $this->app->rebinding('request', function ($app, $request) {
-            $request->setUserResolver(function () use ($app) {
-                return $app['sentinel']->getUser();
-            });
-        });
     }
 
     /**
@@ -96,10 +121,31 @@ class StudioSidekicksProjectBaseProvider extends ServiceProvider
      */
     protected function setOverrides()
     {
-        $config = $this->app['config']->get('bpstudio.base');
+        $config = $this->app['config']->get('studiosidekicks.base');
 
-        $users = $config['users']['model'];
+        if ($config['auth']['back']['is_enabled']) {
+            //Auth for back (app/cms) users
+            $backUserModel = $config['auth']['back']['model'];
 
-        $roles = $config['roles']['model'];
+            $roles = $config['auth']['back']['role_model'];
+
+            if (class_exists($backUserModel)) {
+
+                if (method_exists($backUserModel, 'setRolesModel')) {
+                    forward_static_call_array([$backUserModel, 'setRolesModel'], [$roles]);
+                }
+            }
+
+            if (class_exists($roles) && method_exists($roles, 'setUsersModel')) {
+                forward_static_call_array([$roles, 'setUsersModel'], [$backUserModel]);
+            }
+        }
+
+
+        if ($config['auth']['front']['is_enabled']) {
+            //Standard auth for front users
+            $frontUserModel = $config['auth']['front']['model'];
+        }
+
     }
 }
